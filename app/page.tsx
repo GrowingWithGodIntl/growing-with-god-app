@@ -1,4 +1,13 @@
-export default function Home() {
+import { createServerSupabaseClient } from "../lib/supabase-server";
+export default async function Home() { const supabase = await createServerSupabaseClient();
+
+ const { data: devotional } = await supabase
+    .from("Devotionals")
+    .select("title, scripture, content, publish_date")
+    .eq("published", true)
+    .order("publish_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   return (
     <main className="min-h-screen bg-[#080808] text-[#F4F0E8]">
       <div className="mx-auto min-h-screen max-w-md pb-28">
@@ -117,19 +126,17 @@ export default function Home() {
 
           <div className="rounded-3xl border border-white/10 bg-[#141414] p-6">
             <p className="text-xs uppercase tracking-[0.25em] text-white/40">
-              Nehemiah 6:3–9
-            </p>
+  {devotional?.scripture ?? "Daily Bread"}
+</p>
 
-            <h3 className="mt-3 text-3xl font-semibold">
-              Don&apos;t Look Down
-            </h3>
+<h3 className="mt-3 text-3xl font-semibold">
+  {devotional?.title ?? "Today's Devotional"}
+</h3>
 
-            <p className="mt-4 leading-7 text-white/60">
-              Not every distraction deserves your attention. Sometimes
-              protecting what God called you to build means refusing to
-              come down.
-            </p>
-
+<p className="mt-4 whitespace-pre-line leading-7 text-white/60">
+  {devotional?.content ??
+    "Today's devotional will be available soon."}
+</p>
             <button className="mt-6 flex w-full items-center justify-between rounded-2xl bg-[#F4F0E8] px-5 py-4 font-semibold text-black">
               Read Today&apos;s Devotional
               <span>→</span>
